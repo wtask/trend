@@ -1,0 +1,26 @@
+# schema files
+schema:
+  - internal/graph/*.graphql
+
+# server code
+exec:
+  filename: "internal/graph/server.gqlgen.go"
+  package: "graph"
+
+# model files
+model:
+  filename: "internal/graph/model/models.gqlgen.go"
+  package: "model"
+
+resolver:
+  layout: "follow-schema"
+  dir: "internal/graph"
+  package: "graph"
+
+models:
+  ProgressionRootQuery:
+    fields:
+      percentage:
+        resolver: true
+      immutable:
+        resolver: true
