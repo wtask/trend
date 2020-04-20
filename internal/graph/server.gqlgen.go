@@ -184,7 +184,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "internal/graph/progression.graphql", Input: `"""IncrementalProgressItem represents an element of the number sequence"""
+	&ast.Source{Name: "internal/graph/schema-first/progression.graphql", Input: `"""IncrementalProgressItem represents an element of the numeric sequence"""
 type IncrementalProgressItem {
 	"""Index contains item position in sequence."""
 	index: Int!
@@ -205,8 +205,8 @@ type ProgressionQuery {
 	"""Immutable returns sequense where all items is the same as the first one."""
 	immutable(first: Float!): [IncrementalProgressItem!]!
 }`, BuiltIn: false},
-	&ast.Source{Name: "internal/graph/schema.graphql", Input: `type Query {
-	"""progression is root field to access ProgressionQuery"""
+	&ast.Source{Name: "internal/graph/schema-first/schema.graphql", Input: `type Query {
+	"""Progression queries root"""
 	progression: ProgressionQuery!
 }`, BuiltIn: false},
 }

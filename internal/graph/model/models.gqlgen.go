@@ -2,7 +2,7 @@
 
 package model
 
-// IncrementalProgressItem represents an element of the number sequence
+// IncrementalProgressItem represents an element of the numeric sequence
 type IncrementalProgressItem struct {
 	// Index contains item position in sequence.
 	Index int `json:"index"`

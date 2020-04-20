@@ -19,7 +19,7 @@ func main() {
 	}))
 	api.SetRecoverFunc(func(_ context.Context, err interface{}) error {
 		id := uuid.New().String()
-		log.Println("PANIC", "id: ", id, "due to:", err)
+		log.Println("PANIC", id, "due to:", err)
 		return fmt.Errorf("internal server error [%s]", id)
 	})
 
