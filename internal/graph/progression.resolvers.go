@@ -10,17 +10,15 @@ import (
 	"github.com/wtask/trend/internal/graph/model"
 )
 
-func (r *progressionRootQueryResolver) Percentage(ctx context.Context, obj *model.ProgressionRootQuery, first float64, percents float64) ([]*model.IncrementalProgressItem, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *progressionQueryResolver) Percentage(ctx context.Context, obj *model.ProgressionQuery, first float64, percents float64) ([]*model.IncrementalProgressItem, error) {
+	panic(fmt.Errorf("Percentage resolver not implemented"))
 }
 
-func (r *progressionRootQueryResolver) Immutable(ctx context.Context, obj *model.ProgressionRootQuery, first float64) ([]*model.IncrementalProgressItem, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *progressionQueryResolver) Immutable(ctx context.Context, obj *model.ProgressionQuery, first float64) ([]*model.IncrementalProgressItem, error) {
+	panic(fmt.Errorf("Immutable resolver not implemented"))
 }
 
-// ProgressionRootQuery returns ProgressionRootQueryResolver implementation.
-func (r *Resolver) ProgressionRootQuery() ProgressionRootQueryResolver {
-	return &progressionRootQueryResolver{r}
-}
+// ProgressionQuery returns ProgressionQueryResolver implementation.
+func (r *Resolver) ProgressionQuery() ProgressionQueryResolver { return &progressionQueryResolver{r} }
 
-type progressionRootQueryResolver struct{ *Resolver }
+type progressionQueryResolver struct{ *Resolver }

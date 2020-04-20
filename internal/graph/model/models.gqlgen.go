@@ -2,19 +2,21 @@
 
 package model
 
+// IncrementalProgressItem represents an element of the number sequence
 type IncrementalProgressItem struct {
-	// Item position in sequence
+	// Index contains item position in sequence.
 	Index int `json:"index"`
-	// Item value
+	// Value is the item value.
 	Value float64 `json:"value"`
-	// An absolute value of difference between next and current item value
+	// Increment is the difference between next and current item value.
 	Increment float64 `json:"increment"`
 }
 
-// Queries which compute progrssions
-type ProgressionRootQuery struct {
-	// Returns progression with growing increment in absolute values,
+// ProgressionQuery provides fields to query progressions.
+type ProgressionQuery struct {
+	// Percentage returns progression with growing increment in absolute values,
 	// but the growth is fixed and represents the percentage.
 	Percentage []*IncrementalProgressItem `json:"percentage"`
-	Immutable  []*IncrementalProgressItem `json:"immutable"`
+	// Immutable returns sequense where all items is the same as the first one.
+	Immutable []*IncrementalProgressItem `json:"immutable"`
 }

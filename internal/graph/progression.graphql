@@ -1,20 +1,21 @@
-
+"""IncrementalProgressItem represents an element of the numeric sequence"""
 type IncrementalProgressItem {
-	"""Item position in sequence"""
+	"""Index contains item position in sequence."""
 	index: Int!
-	"""Item value"""
+	"""Value is the item value."""
 	value: Float!
-	"""An absolute value of difference between next and current item value"""
+	"""Increment is the difference between next and current item value."""
 	increment: Float!
 } 
 
-"""Queries which compute progrssions"""
-type ProgressionRootQuery {
+"""ProgressionQuery provides fields to query progressions."""
+type ProgressionQuery {
 	"""
-	Returns progression with growing increment in absolute values,
+	Percentage returns progression with growing increment in absolute values,
 	but the growth is fixed and represents the percentage.
 	"""
 	percentage(first: Float!, percents: Float!): [IncrementalProgressItem!]!
 
+	"""Immutable returns sequense where all items is the same as the first one."""
 	immutable(first: Float!): [IncrementalProgressItem!]!
 }

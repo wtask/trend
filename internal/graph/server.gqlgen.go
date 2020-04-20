@@ -35,7 +35,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	ProgressionRootQuery() ProgressionRootQueryResolver
+	ProgressionQuery() ProgressionQueryResolver
 	Query() QueryResolver
 }
 
@@ -49,7 +49,7 @@ type ComplexityRoot struct {
 		Value     func(childComplexity int) int
 	}
 
-	ProgressionRootQuery struct {
+	ProgressionQuery struct {
 		Immutable  func(childComplexity int, first float64) int
 		Percentage func(childComplexity int, first float64, percents float64) int
 	}
@@ -59,12 +59,12 @@ type ComplexityRoot struct {
 	}
 }
 
-type ProgressionRootQueryResolver interface {
-	Percentage(ctx context.Context, obj *model.ProgressionRootQuery, first float64, percents float64) ([]*model.IncrementalProgressItem, error)
-	Immutable(ctx context.Context, obj *model.ProgressionRootQuery, first float64) ([]*model.IncrementalProgressItem, error)
+type ProgressionQueryResolver interface {
+	Percentage(ctx context.Context, obj *model.ProgressionQuery, first float64, percents float64) ([]*model.IncrementalProgressItem, error)
+	Immutable(ctx context.Context, obj *model.ProgressionQuery, first float64) ([]*model.IncrementalProgressItem, error)
 }
 type QueryResolver interface {
-	Progression(ctx context.Context) (*model.ProgressionRootQuery, error)
+	Progression(ctx context.Context) (*model.ProgressionQuery, error)
 }
 
 type executableSchema struct {
@@ -103,29 +103,29 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.IncrementalProgressItem.Value(childComplexity), true
 
-	case "ProgressionRootQuery.immutable":
-		if e.complexity.ProgressionRootQuery.Immutable == nil {
+	case "ProgressionQuery.immutable":
+		if e.complexity.ProgressionQuery.Immutable == nil {
 			break
 		}
 
-		args, err := ec.field_ProgressionRootQuery_immutable_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProgressionQuery_immutable_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.ProgressionRootQuery.Immutable(childComplexity, args["first"].(float64)), true
+		return e.complexity.ProgressionQuery.Immutable(childComplexity, args["first"].(float64)), true
 
-	case "ProgressionRootQuery.percentage":
-		if e.complexity.ProgressionRootQuery.Percentage == nil {
+	case "ProgressionQuery.percentage":
+		if e.complexity.ProgressionQuery.Percentage == nil {
 			break
 		}
 
-		args, err := ec.field_ProgressionRootQuery_percentage_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProgressionQuery_percentage_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.ProgressionRootQuery.Percentage(childComplexity, args["first"].(float64), args["percents"].(float64)), true
+		return e.complexity.ProgressionQuery.Percentage(childComplexity, args["first"].(float64), args["percents"].(float64)), true
 
 	case "Query.progression":
 		if e.complexity.Query.Progression == nil {
@@ -184,30 +184,30 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "internal/graph/progression.graphql", Input: `
+	&ast.Source{Name: "internal/graph/progression.graphql", Input: `"""IncrementalProgressItem represents an element of the number sequence"""
 type IncrementalProgressItem {
-	"""Item position in sequence"""
+	"""Index contains item position in sequence."""
 	index: Int!
-	"""Item value"""
+	"""Value is the item value."""
 	value: Float!
-	"""An absolute value of difference between next and current item value"""
+	"""Increment is the difference between next and current item value."""
 	increment: Float!
 } 
 
-"""Queries which compute progrssions"""
-type ProgressionRootQuery {
+"""ProgressionQuery provides fields to query progressions."""
+type ProgressionQuery {
 	"""
-	Returns progression with growing increment in absolute values,
+	Percentage returns progression with growing increment in absolute values,
 	but the growth is fixed and represents the percentage.
 	"""
 	percentage(first: Float!, percents: Float!): [IncrementalProgressItem!]!
 
+	"""Immutable returns sequense where all items is the same as the first one."""
 	immutable(first: Float!): [IncrementalProgressItem!]!
 }`, BuiltIn: false},
 	&ast.Source{Name: "internal/graph/schema.graphql", Input: `type Query {
-	# This is the comment which is translated into white space (ignored)
-	"""This is description of the sequence queries"""
-	progression: ProgressionRootQuery!
+	"""progression is root field to access ProgressionQuery"""
+	progression: ProgressionQuery!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -216,7 +216,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_ProgressionRootQuery_immutable_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ProgressionQuery_immutable_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 float64
@@ -230,7 +230,7 @@ func (ec *executionContext) field_ProgressionRootQuery_immutable_args(ctx contex
 	return args, nil
 }
 
-func (ec *executionContext) field_ProgressionRootQuery_percentage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ProgressionQuery_percentage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 float64
@@ -404,7 +404,7 @@ func (ec *executionContext) _IncrementalProgressItem_increment(ctx context.Conte
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProgressionRootQuery_percentage(ctx context.Context, field graphql.CollectedField, obj *model.ProgressionRootQuery) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProgressionQuery_percentage(ctx context.Context, field graphql.CollectedField, obj *model.ProgressionQuery) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -412,7 +412,7 @@ func (ec *executionContext) _ProgressionRootQuery_percentage(ctx context.Context
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:   "ProgressionRootQuery",
+		Object:   "ProgressionQuery",
 		Field:    field,
 		Args:     nil,
 		IsMethod: true,
@@ -420,7 +420,7 @@ func (ec *executionContext) _ProgressionRootQuery_percentage(ctx context.Context
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ProgressionRootQuery_percentage_args(ctx, rawArgs)
+	args, err := ec.field_ProgressionQuery_percentage_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -428,7 +428,7 @@ func (ec *executionContext) _ProgressionRootQuery_percentage(ctx context.Context
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProgressionRootQuery().Percentage(rctx, obj, args["first"].(float64), args["percents"].(float64))
+		return ec.resolvers.ProgressionQuery().Percentage(rctx, obj, args["first"].(float64), args["percents"].(float64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -445,7 +445,7 @@ func (ec *executionContext) _ProgressionRootQuery_percentage(ctx context.Context
 	return ec.marshalNIncrementalProgressItem2ᚕᚖgithubᚗcomᚋwtaskᚋtrendᚋinternalᚋgraphᚋmodelᚐIncrementalProgressItemᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProgressionRootQuery_immutable(ctx context.Context, field graphql.CollectedField, obj *model.ProgressionRootQuery) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProgressionQuery_immutable(ctx context.Context, field graphql.CollectedField, obj *model.ProgressionQuery) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -453,7 +453,7 @@ func (ec *executionContext) _ProgressionRootQuery_immutable(ctx context.Context,
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:   "ProgressionRootQuery",
+		Object:   "ProgressionQuery",
 		Field:    field,
 		Args:     nil,
 		IsMethod: true,
@@ -461,7 +461,7 @@ func (ec *executionContext) _ProgressionRootQuery_immutable(ctx context.Context,
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ProgressionRootQuery_immutable_args(ctx, rawArgs)
+	args, err := ec.field_ProgressionQuery_immutable_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -469,7 +469,7 @@ func (ec *executionContext) _ProgressionRootQuery_immutable(ctx context.Context,
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProgressionRootQuery().Immutable(rctx, obj, args["first"].(float64))
+		return ec.resolvers.ProgressionQuery().Immutable(rctx, obj, args["first"].(float64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -515,9 +515,9 @@ func (ec *executionContext) _Query_progression(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProgressionRootQuery)
+	res := resTmp.(*model.ProgressionQuery)
 	fc.Result = res
-	return ec.marshalNProgressionRootQuery2ᚖgithubᚗcomᚋwtaskᚋtrendᚋinternalᚋgraphᚋmodelᚐProgressionRootQuery(ctx, field.Selections, res)
+	return ec.marshalNProgressionQuery2ᚖgithubᚗcomᚋwtaskᚋtrendᚋinternalᚋgraphᚋmodelᚐProgressionQuery(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1689,17 +1689,17 @@ func (ec *executionContext) _IncrementalProgressItem(ctx context.Context, sel as
 	return out
 }
 
-var progressionRootQueryImplementors = []string{"ProgressionRootQuery"}
+var progressionQueryImplementors = []string{"ProgressionQuery"}
 
-func (ec *executionContext) _ProgressionRootQuery(ctx context.Context, sel ast.SelectionSet, obj *model.ProgressionRootQuery) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, progressionRootQueryImplementors)
+func (ec *executionContext) _ProgressionQuery(ctx context.Context, sel ast.SelectionSet, obj *model.ProgressionQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, progressionQueryImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProgressionRootQuery")
+			out.Values[i] = graphql.MarshalString("ProgressionQuery")
 		case "percentage":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -1708,7 +1708,7 @@ func (ec *executionContext) _ProgressionRootQuery(ctx context.Context, sel ast.S
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._ProgressionRootQuery_percentage(ctx, field, obj)
+				res = ec._ProgressionQuery_percentage(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -1722,7 +1722,7 @@ func (ec *executionContext) _ProgressionRootQuery(ctx context.Context, sel ast.S
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._ProgressionRootQuery_immutable(ctx, field, obj)
+				res = ec._ProgressionQuery_immutable(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -2121,18 +2121,18 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNProgressionRootQuery2githubᚗcomᚋwtaskᚋtrendᚋinternalᚋgraphᚋmodelᚐProgressionRootQuery(ctx context.Context, sel ast.SelectionSet, v model.ProgressionRootQuery) graphql.Marshaler {
-	return ec._ProgressionRootQuery(ctx, sel, &v)
+func (ec *executionContext) marshalNProgressionQuery2githubᚗcomᚋwtaskᚋtrendᚋinternalᚋgraphᚋmodelᚐProgressionQuery(ctx context.Context, sel ast.SelectionSet, v model.ProgressionQuery) graphql.Marshaler {
+	return ec._ProgressionQuery(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProgressionRootQuery2ᚖgithubᚗcomᚋwtaskᚋtrendᚋinternalᚋgraphᚋmodelᚐProgressionRootQuery(ctx context.Context, sel ast.SelectionSet, v *model.ProgressionRootQuery) graphql.Marshaler {
+func (ec *executionContext) marshalNProgressionQuery2ᚖgithubᚗcomᚋwtaskᚋtrendᚋinternalᚋgraphᚋmodelᚐProgressionQuery(ctx context.Context, sel ast.SelectionSet, v *model.ProgressionQuery) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._ProgressionRootQuery(ctx, sel, v)
+	return ec._ProgressionQuery(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

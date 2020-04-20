@@ -5,13 +5,14 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/wtask/trend/internal/graph/model"
 )
 
-func (r *queryResolver) Progression(ctx context.Context) (*model.ProgressionRootQuery, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Progression(ctx context.Context) (*model.ProgressionQuery, error) {
+	// Это корневой ресолвер для query-поля "progression"
+	// Если здесь вернуть ошибку или вызвать панику, то дальнейшая маршрутизация остановится
+	return &model.ProgressionQuery{}, nil
 }
 
 // Query returns QueryResolver implementation.

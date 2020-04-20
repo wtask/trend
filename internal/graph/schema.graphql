@@ -1,5 +1,4 @@
 type Query {
-	# This is the comment which is translated into white space (ignored)
-	"""This is description of the sequence queries"""
-	progression: ProgressionRootQuery!
+	"""Progression queries root"""
+	progression: ProgressionQuery!
 }
