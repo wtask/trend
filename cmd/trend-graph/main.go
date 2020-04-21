@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -13,13 +14,20 @@ import (
 )
 
 func main() {
-	log.SetPrefix("trend-graph ")
+	logger := log.New(os.Stdout, "trend-graph ", log.LstdFlags|log.LUTC)
 	api := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
-		Resolvers: &graph.Resolver{},
+		Resolvers: &graph.Resolver{
+			logger,
+			&graph.ResolverSettings{
+				(&graph.ProgressionSettings{
+					LengthRange: [2]int{5, 100},
+				}).SetLength(15),
+			},
+		},
 	}))
 	api.SetRecoverFunc(func(_ context.Context, err interface{}) error {
 		id := uuid.New().String()
-		log.Println("PANIC", id, "due to:", err)
+		logger.Println("PANIC", id, "due to:", err)
 		return fmt.Errorf("internal server error [%s]", id)
 	})
 
@@ -28,8 +36,8 @@ func main() {
 
 	log.Println("Server started ...")
 	if err := http.ListenAndServe(":8081", nil); err != http.ErrServerClosed {
-		log.Fatalln("ERROR", "Server unexpectedly stopped:", err)
+		logger.Fatalln("ERROR", "Server unexpectedly stopped:", err)
 	}
 	// NOTE При нажатии Ctrl-C сервер чаще всего не успевает остановится
-	log.Println("Server stopped, bye!")
+	logger.Println("Server stopped, bye!")
 }

@@ -4,4 +4,13 @@ package graph
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-type Resolver struct{}
+// Resolver implements GraphQL API logic
+type Resolver struct {
+	Logger
+	*ResolverSettings
+}
+
+// Logger defines interface to log messages
+type Logger interface {
+	Println(v ...interface{})
+}
